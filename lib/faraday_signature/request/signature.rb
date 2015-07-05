@@ -1,3 +1,9 @@
+require 'faraday_signature/request/signature/signable_extractor'
+require 'faraday_signature/timestamper'
+require 'faraday_signature/signer'
+
+require 'rack/request'
+
 module FaradaySignature
   module Request
     class Signature
@@ -12,9 +18,9 @@ module FaradaySignature
       end
 
       def call(env)
-        request = Rack::Request.new(env)
-        request.update_param :timestamp, build_timestamp if timestamper
-        request.update_param :signature, build_signature(request)
+        #request = Rack::Request.new(env)
+        #request.update_param :timestamp, build_timestamp if timestamper
+        #request.update_param :signature, build_signature(request)
         app.call env
       end
 

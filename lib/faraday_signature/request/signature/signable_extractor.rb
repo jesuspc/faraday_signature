@@ -21,7 +21,7 @@ module FaradaySignature
 
         Params = ->(request) { request.params }
         # TODO: Support multipart requests
-        Body = lambda(request) do
+        Body = lambda do |request|
           request.body.rewind
           body_content = request.body.read
           begin

@@ -1,5 +1,16 @@
-require "faraday_signature/version"
+require 'faraday_signature/version'
+require 'faraday_signature/request'
+require 'faraday_signature/signer'
 
 module FaradaySignature
-  # Your code goes here...
+  def self.try
+    require 'faraday'
+    Faraday::Request.register_middleware :request, signature: FaradaySignature::Request::Signature
+
+    conn = Faraday.new(:url => 'http://google.com') do |faraday|
+      faraday.response :logger                  # log requests to STDOUT
+      faraday.request :signature
+      faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+    end
+  end
 end

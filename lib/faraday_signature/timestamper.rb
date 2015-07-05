@@ -1,3 +1,3 @@
 module FaradaySignature
-  Timestamper = -> { Time.now }
+  Timestamper = -> { Time.now.to_i }
 end
