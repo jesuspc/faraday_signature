@@ -19,16 +19,13 @@ module FaradaySignature
           }
         end
 
-        Params = ->(request) { request.params }
-        # TODO: Support multipart requests
+        Params = lambda do |request|
+          request.url.query
+        end
+        # TODO: Support multipart requests by not signing them
         Body = lambda do |request|
           request.body.rewind
-          body_content = request.body.read
-          begin
-            JSON.parse body_content
-          rescue JSON::ParseError
-            {}
-          end
+          request.body.read
         end
       end
     end

@@ -8,8 +8,8 @@ module FaradaySignature
     Faraday::Request.register_middleware :request, signature: FaradaySignature::Request::Signature
 
     conn = Faraday.new(:url => 'http://google.com') do |faraday|
-      faraday.response :logger                  # log requests to STDOUT
       faraday.request :signature
+      faraday.response :logger                  # log requests to STDOUT
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
     end
   end

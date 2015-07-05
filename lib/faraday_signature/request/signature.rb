@@ -2,11 +2,14 @@ require 'faraday_signature/request/signature/signable_extractor'
 require 'faraday_signature/timestamper'
 require 'faraday_signature/signer'
 
-require 'rack/request'
+require 'cgi'
 
 module FaradaySignature
   module Request
     class Signature
+      TIMESTAMP_HEADER = 'Timestamp'.freeze
+      SIGNATURE_HEADER = 'Signature'.freeze
+
       def initialize(app, options = {}, &_)
         @app = app
         @options = options
@@ -18,9 +21,8 @@ module FaradaySignature
       end
 
       def call(env)
-        #request = Rack::Request.new(env)
-        #request.update_param :timestamp, build_timestamp if timestamper
-        #request.update_param :signature, build_signature(request)
+        env[:request_headers][TIMESTAMP_HEADER] = build_timestamp if timestamper
+        env[:request_headers][SIGNATURE_HEADER] = build_signature(env)
         app.call env
       end
 
@@ -42,7 +44,8 @@ module FaradaySignature
         [:params, :body]
       end
 
-      attr_reader :app, :options, :signer, :timestamper, :signable_elms
+      attr_reader :app, :options, :timestamper,
+                  :signer, :signable_extractor, :signable_elms
     end
   end
 end

@@ -9,7 +9,7 @@ module FaradaySignature
     end
 
     def call(to_sign, options = {})
-      text_to_sign = String to_sign.reduce(&:merge)
+      text_to_sign = to_sign.map(&:to_s).join
       secret = options[:secret] || self.secret
 
       hmac.hexdigest sha1, secret, text_to_sign
