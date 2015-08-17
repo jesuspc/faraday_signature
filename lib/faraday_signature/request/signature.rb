@@ -14,7 +14,7 @@ module FaradaySignature
         @app = app
         @options = options
 
-        @signable_elms = Array(options[:signable]) || default_signable_elms
+        @signable_elms = Array(options[:signable] || default_signable_elms)
         @signable_extractor = options[:signable_extractor] || SignableExtractor
         @signer = options[:signer] || Signer
         @timestamper = options.fetch :timestamper, Timestamper
@@ -40,7 +40,7 @@ module FaradaySignature
         signable_extractor.call request, signable_elms
       end
 
-      def default_signable_params
+      def default_signable_elms
         [:params, :body]
       end
 

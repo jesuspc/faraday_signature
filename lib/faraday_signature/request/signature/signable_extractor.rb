@@ -24,8 +24,10 @@ module FaradaySignature
         end
         # TODO: Support multipart requests by not signing them
         Body = lambda do |request|
-          request.body.rewind
-          request.body.read
+          if request.body
+            request.body.rewind
+            request.body.read
+          end
         end
       end
     end
