@@ -1,4 +1,4 @@
-require 'faraday_signature/request/signature'
+require 'signatures/faraday/request/signature'
 
 module FaradaySignature
   module Request
