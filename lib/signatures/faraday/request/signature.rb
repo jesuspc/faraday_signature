@@ -1,6 +1,5 @@
 require 'signatures/faraday/request/signature/signable_extractor'
 require 'signatures/faraday/timestamper'
-require 'signatures/faraday/signer'
 
 require 'cgi'
 
