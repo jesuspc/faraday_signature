@@ -30,7 +30,7 @@ module Signatures
         def call(env)
           env[:request_headers][TIMESTAMP_HEADER] = timestamp if timestamper
           env[:request_headers][SIGNATURE_HEADER] = build_signature(env)
-          env[:request_headers][SIGNATURE_KEY_HEADER] = key
+          env[:request_headers][SIGNATURE_KEY_HEADER] = key.to_s
           app.call env
         end
 

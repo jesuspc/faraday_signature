@@ -26,10 +26,7 @@ module Signatures
           end
           # TODO: Support multipart requests by not signing them
           Body = lambda do |request, _|
-            if request.body
-              request.body.rewind
-              request.body.read
-            end
+            request.body unless request.body.nil?
           end
 
           Timestamp = lambda do |_, opts = {}|

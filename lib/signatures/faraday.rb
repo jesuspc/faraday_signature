@@ -1,3 +1,4 @@
+require 'signatures'
 require 'signatures/faraday/version'
 require 'signatures/faraday/request'
 
