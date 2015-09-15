@@ -1,6 +1,6 @@
 require 'signatures/faraday/request/signature'
 
-module FaradaySignature
+module Signatures::Faraday
   module Request
   end
 end

@@ -1,50 +1,56 @@
 require 'signatures/faraday/request/signature/signable_extractor'
-require 'signatures/faraday/timestamper'
+require 'signatures/timestampers/basic'
+require 'signatures/signers/basic'
 
 require 'cgi'
 
-module FaradaySignature
-  module Request
-    class Signature
-      TIMESTAMP_HEADER = 'Timestamp'.freeze
-      SIGNATURE_HEADER = 'Signature'.freeze
+module Signatures
+  module Faraday
+    module Request
+      class Signature
+        TIMESTAMP_HEADER = 'Timestamp'.freeze
+        SIGNATURE_HEADER = 'Signature'.freeze
+        SIGNATURE_KEY_HEADER = 'Signature_key'.freeze
 
-      def initialize(app, options = {}, &_)
-        @app = app
-        @options = options
+        attr_accessor :app, :options, :timestamper, :secret, :key,
+                      :signer, :signable_extractor, :signable_elms
 
-        @signable_elms = Array(options[:signable] || default_signable_elms)
-        @signable_extractor = options[:signable_extractor] || SignableExtractor
-        @signer = options.fetch(:signer)
-        @timestamper = options.fetch :timestamper, Timestamper
+        def initialize(app, **options)
+          self.app = app
+          self.options = options
+          self.secret = options[:secret]
+          self.key = options[:key]
+
+          self.signable_elms = Array(options[:signable] || [:params, :body, :timestamp])
+          self.signable_extractor = options[:signable_extractor] || SignableExtractor
+          self.signer = options.fetch :signer, Signatures::Signers::Basic.new
+          self.timestamper = options.fetch :timestamper, Signatures::Timestampers::Basic
+        end
+
+        def call(env)
+          env[:request_headers][TIMESTAMP_HEADER] = timestamp if timestamper
+          env[:request_headers][SIGNATURE_HEADER] = build_signature(env)
+          env[:request_headers][SIGNATURE_KEY_HEADER] = key
+          app.call env
+        end
+
+        private
+
+        def build_signature(request)
+          signer.call signable(request), secret: secret
+        end
+
+        def timestamp
+          @timestamp ||= timestamper.call
+        end
+
+        def signable(request)
+          signable_extractor.call request, signable_elms, timestamp: timestamp
+        end
+
+        attr_writer :app, :options, :timestamper, :secret, :key,
+                    :signer, :signable_extractor, :signable_elms
       end
-
-      def call(env)
-        env[:request_headers][TIMESTAMP_HEADER] = build_timestamp if timestamper
-        env[:request_headers][SIGNATURE_HEADER] = build_signature(env)
-        app.call env
-      end
-
-      private
-
-      def build_signature(request)
-        signer.call signable(request)
-      end
-
-      def build_timestamp
-        timestamper.call
-      end
-
-      def signable(request)
-        signable_extractor.call request, signable_elms
-      end
-
-      def default_signable_elms
-        [:params, :body]
-      end
-
-      attr_reader :app, :options, :timestamper,
-                  :signer, :signable_extractor, :signable_elms
     end
   end
 end
