@@ -15,7 +15,9 @@ module Signatures
         attr_accessor :app, :options, :timestamper, :secret, :key,
                       :signer, :signable_extractor, :signable_elms
 
-        def initialize(app, **options)
+        def initialize(app, options = {})
+          options = symbolize_keys(options)
+
           self.app = app
           self.options = options
           self.secret = options[:secret]
@@ -35,6 +37,12 @@ module Signatures
         end
 
         private
+
+        def symbolize_keys(hash)
+          hash.each_with_object({}) do |(k,v), memo|
+            memo[k.to_sym] = v
+          end
+        end
 
         def build_signature(request)
           signer.call signable(request), secret: secret
