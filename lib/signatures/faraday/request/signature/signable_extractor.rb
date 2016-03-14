@@ -17,8 +17,13 @@ module Signatures
             @extractors ||= {
               params: Params,
               body: Body,
+              path: Path,
               timestamp: Timestamp
             }
+          end
+
+          Path = lambda do |request, _|
+            request.url.path
           end
 
           Params = lambda do |request, _|

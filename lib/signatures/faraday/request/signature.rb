@@ -23,7 +23,7 @@ module Signatures
           self.secret = options[:secret]
           self.key = options[:key]
 
-          self.signable_elms = Array(options[:signable] || [:params, :body, :timestamp])
+          self.signable_elms = Array(options[:signable] || [:params, :body, :path, :timestamp])
           self.signable_extractor = options[:signable_extractor] || SignableExtractor
           self.signer = options.fetch :signer, Signatures::Signers::Basic.new
           self.timestamper = options.fetch :timestamper, Signatures::Timestampers::Basic
