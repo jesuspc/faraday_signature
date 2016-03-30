@@ -11,7 +11,7 @@ RSpec.describe 'Signed request', integration: true do
   let(:secret) { 'extremely_secret_stuff' }
   let(:timestamper) { double 'timestamper', call: timestamp }
   let(:timestamp) { 1 }
-  let(:signature) { Signatures::Signers::Basic.new.call("param=1#{timestamp}", secret: secret) }
+  let(:signature) { Signatures::Signers::Basic.new.call("param=1/potato-chimichanga#{timestamp}", secret: secret) }
   let(:params) { { param: 1 } }
   let(:stubs) do
     Faraday::Adapter::Test::Stubs.new do |stub|
