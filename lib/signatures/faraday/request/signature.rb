@@ -33,8 +33,9 @@ module Signatures
         end
 
         def call(env)
+          timestamp = timestamper.call
           env[:request_headers][TIMESTAMP_HEADER] = timestamp if timestamper
-          env[:request_headers][SIGNATURE_HEADER] = build_signature(env)
+          env[:request_headers][SIGNATURE_HEADER] = build_signature(env, timestamp)
           env[:request_headers][SIGNATURE_KEY_HEADER] = key.to_s
           logger.info do
             "[#{Time.now.utc.iso8601}][#{self.class}] Signing Request with Timestamp: "\
@@ -56,18 +57,14 @@ module Signatures
           end
         end
 
-        def build_signature(request)
-          payload = signable(request)
+        def build_signature(request, timestamp)
+          payload = signable(request, timestamp)
           signer.call(payload, secret: secret).tap do |signature|
             logger.info { "[#{Time.now.utc.iso8601}][#{self.class}] Signed payload: #{payload} - Signature: #{signature}" }
           end
         end
 
-        def timestamp
-          @timestamp ||= timestamper.call
-        end
-
-        def signable(request)
+        def signable(request, timestamp)
           signable_extractor.call request, signable_elms, timestamp: timestamp
         end
 

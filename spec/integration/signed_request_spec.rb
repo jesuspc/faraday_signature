@@ -37,5 +37,17 @@ RSpec.describe 'Signed request', integration: true do
         "Signature_key" => key
       )
     end
+
+    it 'adds a new timestamp' do
+      allow(timestamper).to receive(:call) do
+        rand(100000000)
+      end
+      first_res = conn.get
+      second_res = conn.get
+
+      first_timestamp = JSON.parse(first_res.body)['Timestamp']
+      second_timestamp = JSON.parse(second_res.body)['Timestamp']
+      expect(first_timestamp).not_to eq(second_timestamp)
+    end
   end
 end
